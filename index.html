@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Image Links</title>
+</head>
+<body>
+  <h2>Image Links</h2>
+  <ul id="image-links"></ul>
+
+  <script>
+    fetch('https://api.github.com/repos/StarstationHaven/Uploads/contents/images')
+      .then(response => response.json())
+      .then(files => {
+        const ul = document.getElementById('image-links');
+        files.forEach(file => {
+          if (file.name.match(/\.(jpg|jpeg|png|gif)$/i)) {
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = file.download_url;
+            a.textContent = file.download_url;
+            li.appendChild(a);
+            ul.appendChild(li);
+          }
+        });
+      })
+      .catch(err => {
+        document.body.innerHTML = 'Error loading image links.';
+        console.error(err);
+      });
+  </script>
+</body>
+</html>
