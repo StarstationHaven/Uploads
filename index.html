@@ -1,43 +1,46 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
   <title>Image Links</title>
 </head>
 <body>
-  <h2>Image Links</h2>
-  <ul id="image-links"></ul>
+  <h2>Direct Image Links (GitHub Pages URLs)</h2>
+  <ul id="image-list">Loading...</ul>
 
- <script>
-  const username = 'StarstationHaven';
-  const repo = 'Uploads';
-  const branch = 'main'; // or 'master' if your repo uses that
-  const baseUrl = `https://${username}.github.io/${repo}/images/`;
+  <script>
+    const username = 'StarstationHaven';
+    const repo = 'Uploads';
+    const branch = 'main'; // change if needed
+    const folder = 'images'; // your images folder
 
-  const imageList = document.getElementById('image-list');
-  fetch(`https://api.github.com/repos/${username}/${repo}/contents/images`)
-    .then(res => {
-      if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-      return res.json();
-    })
-    .then(data => {
-      imageList.innerHTML = ''; // clear "Loading..."
-      data.forEach(file => {
-        if (file.name.match(/\.(jpg|jpeg|png|gif)$/i)) {
-          const li = document.createElement('li');
-          const a = document.createElement('a');
-          a.href = baseUrl + file.name;
-          a.textContent = a.href;
-          a.target = '_blank';
-          li.appendChild(a);
-          imageList.appendChild(li);
-        }
+    const imageList = document.getElementById('image-list');
+    const githubPagesBase = `https://${username}.github.io/${repo}/${folder}/`;
+
+    fetch(`https://api.github.com/repos/${username}/${repo}/contents/${folder}?ref=${branch}`)
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+        return res.json();
+      })
+      .then(data => {
+        imageList.innerHTML = ''; // clear "Loading..."
+        data.forEach(file => {
+          if (file.name.match(/\.(jpg|jpeg|png|gif|webp|png)$/i)) {
+            const li = document.createElement('li');
+
+            const link = document.createElement('a');
+            link.href = githubPagesBase + encodeURIComponent(file.name);
+            link.textContent = link.href;
+            link.target = '_blank';
+
+            li.appendChild(link);
+            imageList.appendChild(li);
+          }
+        });
+      })
+      .catch(err => {
+        imageList.innerHTML = '⚠️ Error fetching images. Check repo/folder/public status.';
+        console.error('GitHub API error:', err);
       });
-    })
-    .catch(err => {
-      imageList.innerHTML = '⚠️ Error fetching images. Check repo/folder/public status.';
-      console.error('GitHub API error:', err);
-    });
-</script>
+  </script>
 </body>
 </html>
